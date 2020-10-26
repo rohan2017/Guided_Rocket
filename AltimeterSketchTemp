@@ -1,0 +1,76 @@
+#define BMP_ADDR 0x77
+#include <Wire.h>
+
+// BMP388 Altimeter Variables
+uint32_t pressure, temperature;
+
+void setup() { // put your setup code here, to run once:
+  
+  Serial.begin(115200);
+  Wire.begin();
+  setup_bmp388_registers();
+  
+}
+
+void loop() { // put your main code here, to run repeatedly:
+  
+  read_bmp388_data();
+  Serial.print(pressure);
+  Serial.print(",");
+  Serial.println(temperature);
+  delay(20);
+  
+}
+
+void setup_bmp388_registers() {
+  
+  //Trigger a reset
+  Wire.beginTransmission(BMP_ADDR);
+  Wire.write(0x7E);
+  Wire.write(0xB6);
+  Wire.endTransmission();
+  delay(20);
+  
+  //Set Oversampling (x16)
+  Wire.beginTransmission(BMP_ADDR);
+  Wire.write(0x1C);
+  Wire.write(0x05); //0x03
+  Wire.endTransmission();
+  delay(20);
+  
+  //Set the Output Data Rate 20ms = 50Hz
+  Wire.beginTransmission(BMP_ADDR);
+  Wire.write(0x1D);
+  Wire.write(0x02);
+  Wire.endTransmission();
+  delay(20);
+  
+  //Set the IIR Filter Coefficients 16
+  Wire.beginTransmission(BMP_ADDR);
+  Wire.write(0x1F);
+  Wire.write(0x04); //0x02
+  Wire.endTransmission();
+  delay(20);
+  
+  //Setup Serial Interface Settings
+  Wire.beginTransmission(BMP_ADDR);
+  Wire.write(0x1B);
+  Wire.write(0x01|0x10|0x30); //0x10|0x10|0x30
+  Wire.endTransmission();
+  delay(20);
+  
+}
+
+void read_bmp388_data() {
+  
+  uint8_t data[6]; //Create data buffer
+  Wire.beginTransmission(BMP_ADDR);
+  Wire.write(0x04); //Start reading @ register 43h and auto increment with every read.
+  Wire.endTransmission();
+  Wire.requestFrom(BMP_ADDR, 6); //Request 8 bytes from the BMP. 
+  uint8_t i = 0;
+  while(Wire.available()) { data[i++] = Wire.read();}
+  pressure = (uint32_t)data[5] << 16 | (uint32_t)data[4] << 8 | (uint32_t)data[3];
+  temperature = (uint32_t)data[2] << 16 | (uint32_t)data[1] << 8 | (uint32_t)data[0];
+  
+}
