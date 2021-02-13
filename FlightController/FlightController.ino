@@ -34,7 +34,9 @@ Servo servo_Pitch_W;
 
 // Feedback Loop Variables
 float yaw_Error, pitch_Error, roll_Error;
-float yaw_Correction, pitch_Correction, roll_Correction;
+float yaw_Correction = 0;
+float pitch_Correction = 0;
+float roll_Correction = 0;
 float yaw_LastError = 0;
 float pitch_LastError = 0;
 float roll_LastError = 0;
