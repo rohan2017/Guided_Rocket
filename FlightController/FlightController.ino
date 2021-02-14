@@ -169,7 +169,7 @@ void loop() {
   //angle_yaw += angle_pitch * sin((float)gyro_y_rate * 0.17453); // Convert to radians, pi/180 = 0.17453 then multiply by 0.002 = 0.0000349
   //angle_pitch -= angle_yaw * sin((float)gyro_y_rate * 0.17453); // BROKEN
 
-  do_PIDs();
+  //do_PIDs();
   write_servos();
   
   // Logging Functions ------------------------------------------------------------------------------------
